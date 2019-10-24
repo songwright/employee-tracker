@@ -26,7 +26,6 @@ var connection = mysql.createConnection({
   database: "employees"
 });
 
-
 var showroles;
 var showdepartments;
 
@@ -39,26 +38,22 @@ connection.connect(function (err) {
   console.log("connected as id " + connection.threadId);
 
   connection.query("SELECT * from role", function (error, res) {
-    // console.log(res)
-     showroles = res.map(role => ({ name: role.title, value: role.id }))
-
+    showroles = res.map(role => ({ name: role.title, value: role.id }))
   })
   connection.query("SELECT * from department", function (error, res) {
-    // console.log(res)
-     showdepartments = res.map(dep => ({ name: dep.name, value: dep.id }))
-
+    showdepartments = res.map(dep => ({ name: dep.name, value: dep.id }))
   })
 
-  showmenu()
+  showmenu();
 })
-// show menu
 
+// Show inquirer menu
 function showmenu() {
   inquirer
     .prompt(
       {
         type: "list",
-        message: "What would you like to do?",
+        message: "Welcome to Employee Tracker. What would you like to do?",
         name: "choices",
         choices: [
           {
@@ -79,7 +74,7 @@ function showmenu() {
           },
           {
             name: "Add department",
-            value: "addDepartment"
+            value: "addDept"
           },
           {
             name: "Add role",
@@ -91,14 +86,12 @@ function showmenu() {
           }
         ]
       }).then(function (res) {
-        console.log(res)
-        menu(res.choices)
-      })
-
+      // console.log(res)
+      menu(res.choices)
+    })
 }
 
 function menu(option) {
-
   switch (option) {
     case "viewEmployees":
       viewAllEmployees();
@@ -112,14 +105,14 @@ function menu(option) {
     case "addEmployee":
       addEmployee();
       break;
-    case "addDepartment":
-      addDepartment();
+    case "addDept":
+      addDept();
       break;
     case "addRole":
       addRole();
       break;
-    case "quiet":
-      end()
+    case "quit":
+      end();
   }
 }
 
@@ -161,16 +154,21 @@ function addEmployee() {
         name: "title",
         choices: showroles
       },
+      // {
+      //   type: "list",
+      //   message: "What is the employee's department?",
+      //   name: "manager",
+      //   choices: showdepartments
+      // }
       {
-        type: "list",
-        message: "Who is the employee's manager?",
+        type: "input",
+        message: "What is the id of the employee's manager?",
         name: "manager",
-        choices: showdepartments
+        // choices: showdepartments
       }
     ]).then(function (response) {
       console.log(response)
       addEmployees(response)
-      //  addEmployees(response)
     })
   //ask the user for all the input data
 }
@@ -184,15 +182,36 @@ function addEmployees(data) {
       manager_id: data.manager
 
     }, function (error, res) {
-      console.log(res, error);
+      // console.log(res, error);
+      if (error) throw error;
     })
 }
 
+
+
+// function endOrMenu() {
+//   inquirer
+//     .prompt([
+//       {
+//         type: 'input',
+//         message: "Quit or continue?",
+//         name: "choices",
+//         choices: [
+//           {
+//             name: "Quit",
+//             value: "quit"
+//           },
+//           {
+//             name: "Quit",
+//             value: "quit"
+//           }
+//         ]
+//       }
+//     ])
+// }
+
 function end() {
-  console.log("good bye")
+  console.log("Thank you for using Employee Tracker!")
   connection.end()
   process.exit()
 }
-
-
-// actions  // create a function for each action 
