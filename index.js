@@ -1,21 +1,7 @@
 // Dependencies
-var express = require("express");
 var mysql = require("mysql");
 const inquirer = require("inquirer");
-require("console.table");
-var functions = require("./functions");
-
-// // const questions = [
-//   {
-//     type: "input",
-//     message: "View All Employeese",
-//     name: "viewEmployees"
-//   }
-// // ];
-
-
-// Create express app instance.
-//var app = express();
+const confirm = require('inquirer-confirm');
 
 // MySQL DB Connection Information
 var connection = mysql.createConnection({
@@ -154,12 +140,6 @@ function addEmployee() {
         name: "title",
         choices: showroles
       },
-      // {
-      //   type: "list",
-      //   message: "What is the employee's department?",
-      //   name: "manager",
-      //   choices: showdepartments
-      // }
       {
         type: "input",
         message: "What is the id of the employee's manager?",
@@ -185,6 +165,7 @@ function addEmployees(data) {
       // console.log(res, error);
       if (error) throw error;
     })
+    endOrMenu();
 }
 
 function addDept() {
@@ -205,32 +186,22 @@ function addDept() {
 function addDepartment(data) {
   connection.query("INSERT INTO department SET ?", { name: data.name },
   function (error, res) {
-    console.log(error, res);
+    // console.log(error, res);
     if (error) throw error;
   });
-  end();
+  endOrMenu();
 }
 
-// function endOrMenu() {
-//   inquirer
-//     .prompt([
-//       {
-//         type: 'input',
-//         message: "Quit or continue?",
-//         name: "choices",
-//         choices: [
-//           {
-//             name: "Quit",
-//             value: "quit"
-//           },
-//           {
-//             name: "Quit",
-//             value: "quit"
-//           }
-//         ]
-//       }
-//     ])
-// }
+function endOrMenu() {
+  confirm("Would you like to continue?")
+  .then(function confirmed() {
+    console.log('Continuing');
+    showmenu();
+  }, function cancelled() {
+    console.log('Ending');
+    end();
+  });
+}
 
 function end() {
   console.log("Thank you for using Employee Tracker!")

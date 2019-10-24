@@ -13,6 +13,7 @@
     "console.table": "^0.10.0",
     "express": "^4.16.3",
     "inquirer": "^7.0.0",
+    "inquirer-confirm": "^2.0.7",
     "mysql": "^2.16.0"
   }
 }
