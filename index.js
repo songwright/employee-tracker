@@ -13,7 +13,7 @@ var connection = mysql.createConnection({
 });
 
 var showroles;
-// var showdepartments;
+var showemployees;
 
 // Initiate MySQL Connection.
 connection.connect(function (err) {
@@ -26,9 +26,11 @@ connection.connect(function (err) {
   connection.query("SELECT * from role", function (error, res) {
     showroles = res.map(role => ({ name: role.title, value: role.id }))
   })
-  // connection.query("SELECT * from department", function (error, res) {
-  //   showdepartments = res.map(dep => ({ name: dep.name, value: dep.id }))
-  // })
+  connection.query("SELECT * from employee", function (error, res) {
+    // console.log(error, res);
+    // showemployees = res.map(emp => ({ name: CONCAT(emp.first_name, ' ', emp.last_name), value: emp.id }))
+    showemployees = res.map(emp => ({ name: `${emp.first_name} ${emp.last_name}`, value: emp.id }))
+  })
 
   showmenu();
 })
@@ -67,11 +69,16 @@ function showmenu() {
             value: "addRole"
           },
           {
+            name: "Update role",
+            value: "updateRole"
+          },
+          {
             name: "Quit",
             value: "quit"
           }
         ]
       }).then(function (res) {
+        console.log(res);
       menu(res.choices)
     })
 }
@@ -96,6 +103,9 @@ function menu(option) {
     case "addRole":
       addRole();
       break;
+    case "updateRole":
+      updateRole();
+      break;
     case "quit":
       end();
   }
@@ -118,7 +128,7 @@ function viewAllDepartments() {
 
 function viewAllRoles() {
   connection.query("SELECT * from role", function (error, res) {
-    console.table(res);
+    // console.table(res);
     endOrMenu();
   })
 }
@@ -229,13 +239,42 @@ function addEmployeeRole(data) {
   endOrMenu();
 }
 
+function updateRole() {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        message: "For which employee would you like to update the role?",
+        name: "empID",
+        choices: showemployees
+      },
+      {
+        type: "list",
+        message: "What is the id of the department?",
+        name: "titleID",
+        choices: showroles
+      }
+    ])
+    .then(function (response) {
+      // console.log(response);
+      updateEmployeeRole(response);
+    })
+}
+
+function updateEmployeeRole(data) {
+  connection.query(`UPDATE employee SET role_id = ${data.titleID} WHERE id = ${data.empID}`,
+  function (error, res) {
+    // console.log(error, res);
+    if (error) throw error;
+  });
+  endOrMenu();
+}
+
 function endOrMenu() {
   confirm("Would you like to continue?")
   .then(function confirmed() {
-    // console.log('Continuing');
     showmenu();
   }, function cancelled() {
-    // console.log('Ending');
     end();
   });
 }
