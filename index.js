@@ -128,7 +128,7 @@ function viewAllDepartments() {
 
 function viewAllRoles() {
   connection.query("SELECT * from role", function (error, res) {
-    // console.table(res);
+    console.table(res);
     endOrMenu();
   })
 }
@@ -250,7 +250,7 @@ function updateRole() {
       },
       {
         type: "list",
-        message: "What is the id of the department?",
+        message: "What is the employee's new role?",
         name: "titleID",
         choices: showroles
       }
