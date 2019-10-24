@@ -13,6 +13,7 @@ var connection = mysql.createConnection({
 });
 
 var showroles;
+var showdepartments;
 var showemployees;
 
 // Initiate MySQL Connection.
@@ -26,9 +27,11 @@ connection.connect(function (err) {
   connection.query("SELECT * from role", function (error, res) {
     showroles = res.map(role => ({ name: role.title, value: role.id }))
   })
+  connection.query("SELECT * from department", function (error, res) {
+    showdepartments = res.map(dep => ({ name: dep.name, value: dep.id }))
+  })
   connection.query("SELECT * from employee", function (error, res) {
     // console.log(error, res);
-    // showemployees = res.map(emp => ({ name: CONCAT(emp.first_name, ' ', emp.last_name), value: emp.id }))
     showemployees = res.map(emp => ({ name: `${emp.first_name} ${emp.last_name}`, value: emp.id }))
   })
 
@@ -78,7 +81,7 @@ function showmenu() {
           }
         ]
       }).then(function (res) {
-        console.log(res);
+        // console.log(res);
       menu(res.choices)
     })
 }
@@ -154,9 +157,10 @@ function addEmployee() {
         choices: showroles
       },
       {
-        type: "input",
-        message: "What is the id of the employee's manager?",
+        type: "list",
+        message: "Who is the employee's manager?",
         name: "manager",
+        choices: showemployees,
       }
     ]).then(function (response) {
       // console.log(response)
@@ -216,13 +220,14 @@ function addRole() {
         name: "salary"
       },
       {
-        type: "input",
-        message: "What is the id of the department?",
-        name: "id"
+        type: "list",
+        message: "In which department is the new role?",
+        name: "id",
+        choices: showdepartments
       }
     ])
     .then(function (response) {
-      console.log(response);
+      // console.log(response);
       addEmployeeRole(response);
     })
 }
@@ -280,7 +285,7 @@ function endOrMenu() {
 }
 
 function end() {
-  console.log("Thank you for using Employee Tracker!")
-  connection.end()
-  process.exit()
+  console.log("Thank you for using Employee Tracker!");
+  connection.end();
+  process.exit();
 }
