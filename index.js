@@ -115,7 +115,14 @@ function menu(option) {
 }
 
 function viewAllEmployees() {
-  connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;", function (error, res) {
+  connection.query(`SELECT employee.id, employee.first_name AS 'First Name', 
+  employee.last_name AS 'Last Name', role.title AS Title, department.name AS Department,
+  role.salary AS Salary, CONCAT(boss.first_name, ' ', boss.last_name) AS Manager
+  FROM employee 
+  JOIN role on employee.role_id = role.id
+  JOIN department on role.department_id = department.id
+  LEFT JOIN employee boss on boss.id = employee.manager_id
+  ORDER BY employee.last_name;`, function (error, res) {
     console.table(res);
     endOrMenu();
   })
