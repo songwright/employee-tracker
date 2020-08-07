@@ -31,8 +31,7 @@ connection.connect(function (err) {
     showdepartments = res.map(dep => ({ name: dep.name, value: dep.id }))
   })
   connection.query("SELECT * from employee", function (error, res) {
-    // console.log(error, res);
-    showemployees = res.map(emp => ({ name: `${emp.first_name} ${emp.last_name}`, value: emp.id }))
+    showemployees = res.map(emp => ({ name: `${emp.first_name} ${emp.last_name}, id: ${emp.id}`, value: emp.id }))
   })
 
   showmenu();
@@ -64,6 +63,10 @@ function showmenu() {
             value: "addEmployee"
           },
           {
+            name: "Delete employee",
+            value: "deleteEmployee"
+          },
+          {
             name: "Add department",
             value: "addDept"
           },
@@ -81,9 +84,8 @@ function showmenu() {
           }
         ]
       }).then(function (res) {
-        // console.log(res);
-      menu(res.choices)
-    })
+        menu(res.choices)
+      })
 }
 
 function menu(option) {
@@ -99,6 +101,9 @@ function menu(option) {
       break;
     case "addEmployee":
       addEmployee();
+      break;
+    case "deleteEmployee":
+      deleteEmployee();
       break;
     case "addDept":
       addDept();
@@ -170,7 +175,6 @@ function addEmployee() {
         choices: showemployees,
       }
     ]).then(function (response) {
-      // console.log(response)
       addEmployees(response)
     })
 }
@@ -186,7 +190,27 @@ function addEmployees(data) {
     }, function (error, res) {
       if (error) throw error;
     })
-    endOrMenu();
+  endOrMenu();
+}
+
+function deleteEmployee() {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        message: "Which employee do you want to delete?",
+        name: "empID",
+        choices: showemployees
+      }
+    ])
+    .then(function (response) {
+      console.log("Employee id: " + response.empID + " deleted.");
+      connection.query(`DELETE from employee WHERE id = ${response.empID}`,
+        function (err, res) {
+          if (err) throw err;
+        });
+      endOrMenu();
+    })
 }
 
 function addDept() {
@@ -199,17 +223,15 @@ function addDept() {
       }
     ])
     .then(function (response) {
-      // console.log(response);
       addDepartment(response);
     })
 }
 
 function addDepartment(data) {
   connection.query("INSERT INTO department SET ?", { name: data.name },
-  function (error, res) {
-    // console.log(error, res);
-    if (error) throw error;
-  });
+    function (error, res) {
+      if (error) throw error;
+    });
   endOrMenu();
 }
 
@@ -234,7 +256,6 @@ function addRole() {
       }
     ])
     .then(function (response) {
-      // console.log(response);
       addEmployeeRole(response);
     })
 }
@@ -245,7 +266,6 @@ function addEmployeeRole(data) {
     salary: data.salary,
     department_id: data.id
   }, function (error, res) {
-    // console.log(error, res);
     if (error) throw error;
   });
   endOrMenu();
@@ -268,27 +288,25 @@ function updateRole() {
       }
     ])
     .then(function (response) {
-      // console.log(response);
       updateEmployeeRole(response);
     })
 }
 
 function updateEmployeeRole(data) {
   connection.query(`UPDATE employee SET role_id = ${data.titleID} WHERE id = ${data.empID}`,
-  function (error, res) {
-    // console.log(error, res);
-    if (error) throw error;
-  });
+    function (error, res) {
+      if (error) throw error;
+    });
   endOrMenu();
 }
 
 function endOrMenu() {
   confirm("Would you like to continue?")
-  .then(function confirmed() {
-    showmenu();
-  }, function cancelled() {
-    end();
-  });
+    .then(function confirmed() {
+      showmenu();
+    }, function cancelled() {
+      end();
+    });
 }
 
 function end() {
