@@ -14,6 +14,6 @@
     "express": "^4.18.2",
     "inquirer": "^7.0.0",
     "inquirer-confirm": "^2.0.7",
-    "mysql": "^2.16.0"
+    "mysql": "^2.18.0"
   }
 }
